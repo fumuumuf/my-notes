@@ -141,6 +141,7 @@ NAVIGATION_LINKS = {
         ('/index.html', 'Home', 'fa fa-home'),
         ('/archive.html', 'Archives', 'fa fa-folder-open'),
         ('/categories/index.html', 'Tags', 'fa fa-tags'),
+        ('https://twitter.com/fumuumuf', 'twitter', 'fab fa-twitter'),
     )
 }
 
