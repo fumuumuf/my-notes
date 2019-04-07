@@ -1294,7 +1294,7 @@ a:focus {
 .page-content > .content .h4,
 .page-content > .content .h5,
 .page-content > .content .h6 {
-  margin: 12px 0;
+  margin: 32px 0 12px 0;
   font-family: inherit;
   font-weight: bold;
   line-height: 24px;
@@ -1369,6 +1369,7 @@ a:focus {
   -o-hyphens: auto;
   hyphens: auto;
   margin: 0 0 12px;
+  line-height: 2rem;
 }
 .page-content > .content em {
   font-style: italic;

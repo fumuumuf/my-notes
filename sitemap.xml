@@ -15,15 +15,23 @@
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/archive.html</loc>
-  <lastmod>2019-04-07T13:55:00Z</lastmod>
+  <lastmod>2019-04-07T18:05:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/</loc>
-  <lastmod>2019-04-07T13:19:00Z</lastmod>
+  <lastmod>2019-04-07T18:05:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/cat_django.html</loc>
+  <lastmod>2019-04-07T18:21:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/dialy.html</loc>
   <lastmod>2019-04-07T13:55:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/django.html</loc>
+  <lastmod>2019-04-07T18:21:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/galleries/</loc>
@@ -35,6 +43,10 @@
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/dialy-2019-04-02.html</loc>
-  <lastmod>2019-04-07T13:55:00Z</lastmod>
+  <lastmod>2019-04-07T18:05:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</loc>
+  <lastmod>2019-04-07T18:21:00Z</lastmod>
  </url>
 </urlset>
