@@ -1,3 +1,0 @@
-Nikola[extras]
-jupyter-contrib-nbextensions
-ghp-import2
