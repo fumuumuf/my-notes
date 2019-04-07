@@ -1012,12 +1012,12 @@ article.post-text .metadata h3 {
 article.post-text .metadata .tags {
   clear: both;
   display: block;
-  opacity: 0.2;
+/*  opacity: 0.5;
   filter: alpha(opacity=20);
   -webkit-transition: opacity 0.1s linear;
   -moz-transition: opacity 0.1s linear;
   -o-transition: opacity 0.1s linear;
-  transition: opacity 0.1s linear;
+  transition: opacity 0.1s linear; */
 }
 article.post-text .metadata .tags:hover {
   opacity: 1;
