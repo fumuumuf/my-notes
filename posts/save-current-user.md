@@ -9,7 +9,8 @@
 .. type: text
 -->
 
-ログインユーザーを作成・更新ユーザーとして, モデルエンティティに記録する.  
+モデルのインスタンスを save するときに, ログインユーザーを作成・更新ユーザーとして記録する.
+
 以下パッケージが目的に合っているのでお試しする.  
 
 [PaesslerAG/django-currentuser: Conveniently store reference to request user on thread/db level.](https://github.com/PaesslerAG/django-currentuser)
