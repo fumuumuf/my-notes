@@ -1321,23 +1321,23 @@ a:focus {
 .page-content > .content .h1,
 .page-content > .content h2,
 .page-content > .content .h2 {
-  line-height: 48px;
+  line-height: 40px;
 }
 .page-content > .content h3,
 .page-content > .content .h3 {
-  line-height: 36px;
+  line-height: 30px;
 }
 .page-content > .content h1,
 .page-content > .content .h1 {
-  font-size: 41.25px;
+  font-size: 34px;
 }
 .page-content > .content h2,
 .page-content > .content .h2 {
-  font-size: 33.75px;
+  font-size: 28px;
 }
 .page-content > .content h3,
 .page-content > .content .h3 {
-  font-size: 26.25px;
+  font-size: 22.25px;
 }
 .page-content > .content h4 {
   font-size: 18.75px;
