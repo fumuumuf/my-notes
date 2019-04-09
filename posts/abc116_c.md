@@ -1,6 +1,6 @@
 <!--
 .. title: ABC116_C
-.. slug: ABC116_C
+.. slug: abc116_c
 .. date: 2019-04-10 00:57:39 UTC+09:00
 .. tags: ABC
 .. category: ABC
