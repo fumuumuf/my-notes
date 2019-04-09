@@ -7,11 +7,11 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/abc.xml</loc>
-  <lastmod>2019-04-09T16:30:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/cat_abc.xml</loc>
-  <lastmod>2019-04-09T16:30:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/cat_django.xml</loc>
@@ -26,31 +26,15 @@
   <lastmod>2019-04-07T18:26:00Z</lastmod>
  </sitemap>
  <sitemap>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/has_math-sapm.xml</loc>
-  <lastmod>2019-04-09T16:15:00Z</lastmod>
- </sitemap>
- <sitemap>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/mathjax-sapm.xml</loc>
-  <lastmod>2019-04-09T16:11:00Z</lastmod>
- </sitemap>
- <sitemap>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/mathjax.xml</loc>
-  <lastmod>2019-04-09T16:11:00Z</lastmod>
- </sitemap>
- <sitemap>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/sapm.xml</loc>
-  <lastmod>2019-04-09T16:17:00Z</lastmod>
- </sitemap>
- <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/galleries/rss.xml</loc>
   <lastmod>2019-04-07T13:55:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml</loc>
-  <lastmod>2019-04-09T16:38:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/sitemap.xml</loc>
-  <lastmod>2019-04-09T16:38:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </sitemap>
 </sitemapindex>

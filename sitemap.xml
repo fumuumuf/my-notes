@@ -19,15 +19,15 @@
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/</loc>
-  <lastmod>2019-04-09T16:27:00Z</lastmod>
+  <lastmod>2019-04-09T16:41:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/abc.html</loc>
-  <lastmod>2019-04-09T16:30:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/cat_abc.html</loc>
-  <lastmod>2019-04-09T16:30:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/cat_django.html</loc>
@@ -42,22 +42,6 @@
   <lastmod>2019-04-07T18:26:00Z</lastmod>
  </url>
  <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/has_math-sapm.html</loc>
-  <lastmod>2019-04-09T16:15:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/mathjax-sapm.html</loc>
-  <lastmod>2019-04-09T16:11:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/mathjax.html</loc>
-  <lastmod>2019-04-09T16:11:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/sapm.html</loc>
-  <lastmod>2019-04-09T16:17:00Z</lastmod>
- </url>
- <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/galleries/</loc>
   <lastmod>2019-04-07T13:19:00Z</lastmod>
  </url>
@@ -67,7 +51,7 @@
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</loc>
-  <lastmod>2019-04-09T16:30:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/dialy-2019-04-02.html</loc>
@@ -75,6 +59,6 @@
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</loc>
-  <lastmod>2019-04-09T16:27:00Z</lastmod>
+  <lastmod>2019-04-09T16:45:00Z</lastmod>
  </url>
 </urlset>
