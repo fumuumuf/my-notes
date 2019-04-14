@@ -3,7 +3,7 @@
 .. slug: abc116_c
 .. date: 2019-04-10 00:57:39 UTC+09:00
 .. tags: ABC
-.. category: ABC
+.. category:
 .. link: 
 .. description: AtCoder abc116_c solution
 .. type: text

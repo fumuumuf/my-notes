@@ -3,7 +3,7 @@
 .. slug: save-current-user
 .. date: 2019-04-08 02:33:06 UTC+09:00
 .. tags: Django
-.. category: Django
+.. category:
 .. link: 
 .. description: 作成・更新ユーザーの保存
 .. type: text
