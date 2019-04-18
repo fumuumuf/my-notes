@@ -332,6 +332,7 @@ section {
 }
 .page-content > .content {
   max-width: 1140px;
+  margin: 0 auto;
 }
 @media (min-width: 774px) and (max-width: 1047px) {
   .page-content > .content {
@@ -608,7 +609,8 @@ a {
 a:hover,
 a:focus {
   color: #005580;
-  text-decoration: underline;
+  /*text-decoration: underline;*/
+  opacity:0.6;
 }
 .social a {
   color: #fff;
@@ -681,7 +683,7 @@ a:focus {
   font-family: inherit;
   font-weight: bold;
   line-height: 24px;
-  color: #E04583;
+  color: #EB3398;
   text-rendering: optimizelegibility;
 }
 .page-content > .content h1 small,
@@ -1107,4 +1109,8 @@ article.post-text + article.post-text {
 
 .content div.output_prompt {
     margin-right: 10px;
+}
+
+code, pre.code, .highlight pre{
+    background: #f7f7fe;
 }
