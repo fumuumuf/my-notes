@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html prefix="
+        og: http://ogp.me/ns# article: http://ogp.me/ns/article#
+    " vocab="http://ogp.me/ns" lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Django multi tenant app">
+<meta name="viewport" content="width=device-width">
+<title>[Django] マルチテナントやってみた | Data Scientist gocco</title>
+<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link href="../../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<link href="../../../assets/css/ipython.min.css" rel="stylesheet" type="text/css">
+<link href="../../../assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" hreflang="ja" href="../../../rss.xml">
+<link rel="canonical" href="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/">
+<!--[if lt IE 9]><script src="../../../assets/js/html5shiv-printshiv.min.js"></script><![endif]--><meta name="author" content="fumuumuf">
+<link rel="prev" href="../../abc116_c.html" title="ABC116_C" type="text/html">
+<meta property="og:site_name" content="Data Scientist gocco">
+<meta property="og:title" content="[Django] マルチテナントやってみた">
+<meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/">
+<meta property="og:description" content="Django multi tenant app">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2019-04-19T00:00:00+09:00">
+<meta property="article:tag" content="Django">
+</head>
+<body>
+    <a href="#page-content" class="sr-only sr-only-focusable">本文を読み飛ばす</a>
+    <section class="social"><ul>
+<li><a href="../../../index.html" title="Home"><i class="fa fa-home"></i></a></li>
+            <li><a href="../../../archive.html" title="Archives"><i class="fa fa-folder-open"></i></a></li>
+            <li><a href="../../../categories/index.html" title="Tags"><i class="fa fa-tags"></i></a></li>
+            <li><a href="https://twitter.com/fumuumuf" title="twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="https://www.kaggle.com/fumuumuf" title="kaggle"><i class="fab fa-kaggle"></i></a></li>
+    
+    
+
+        </ul></section><section class="page-content"><div class="content" rel="main">
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url">[Django] マルチテナントやってみた</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><a href="." rel="bookmark"><i class="fa fa-clock"></i> <time class="published dt-published" datetime="2019-04-19T00:00:00+09:00" itemprop="datePublished" title="2019-04-19 00:00">2019-04-19 00:00</time></a></p>
+            
+            
+                <div class="tags">
+<h3 class="metadata-title">
+<i class="fa fa-tags"></i> タグ:</h3>
+        <ul itemprop="keywords" class="tags-ul">
+<li><a class="tag p-category" href="../../../categories/django.html" rel="tag">Django</a></li>
+        </ul>
+</div>
+
+        </div>
+    </header><div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<h3>はじめに</h3>
+<p>1つのアプリケーションで店舗や施設, 企業ごとに独立したデータを扱いたいことは稀にあります. そんなときに使えそうなのが Multi Tenant.</p>
+<p><a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html">Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation</a></p>
+<p>上記サイトでは</p>
+<ul>
+<li>1つのスキーマ内で独立させる</li>
+<li>1つのDBで, 個別のスキーマを作り独立させる</li>
+<li>DB自体 を独立させる</li>
+<li>Docker を使って独立させる</li>
+</ul>
+<p>方法が掲載されています. </p>
+<p>どれも長所短所あると思うので, 要件に応じて使い分けるべきかなという印象.</p>
+<p>1つめの1つのスキーマ内で独立させる方法は, どうしても <code>店舗id</code> のような属性が必要になるので, そのフィルタリングを付与する方法を合わせて考えたほうが良いと思います.</p>
+<p>今回は3つめのDB自体を独立させる方法を少しカスタマイズしつつ実装してみます.</p>
+<h3>要件</h3>
+<ul>
+<li>上記サイトにならい 店舗は <code>thor</code>, <code>potter</code> があるとして, それぞれ専用の DB を用意します</li>
+<li>アカウントなど他の app も DB を分けて管理します. 2つの店舗間で情報は共有されません</li>
+<li>
+<code>thor.local</code>, <code>potter.local</code> ドメインがあるとし, アクセスに対しそれぞれ <code>thor</code> DB, <code>potter</code> DB を参照するようにします</li>
+</ul>
+<h3>環境</h3>
+<ul>
+<li>Python 3.7</li>
+<li>Django 2.1</li>
+<li>DB: SQLite</li>
+</ul>
+<h3>実装</h3>
+<p><a href="https://github.com/fumuumuf/simple_drf/tree/multi_tenant">サンプルコード fumuumuf/simple_drf at multi_tenant</a></p>
+<h4>ざっくり手順</h4>
+<ol>
+<li>middleware でアクセスされたドメインから使用するDBを判別し <code>threading.local</code> に記録</li>
+<li>Database routing で 1 で記録した DB から使用する DB へルーティング</li>
+</ol>
+<p>おおまかな手順はこれだけです.</p>
+<h4>DB 設定</h4>
+<p>DB の設定をします. 2つの DB <code>thor</code>, <code>potter</code> を追加します.</p>
+<p>後述する db routing の設定 の <code>DATABASE_ROUTERS</code> も合わせて行います.</p>
+<pre class="code literal-block"><span></span># simple_drf/settings.py
+
+DATABASES = {
+    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "default.sqlite3"},
+    "thor": {"ENGINE": "django.db.backends.sqlite3", "NAME": "thor.sqlite3"},
+    "potter": {"ENGINE": "django.db.backends.sqlite3", "NAME": "potter.sqlite3"},
+}
+
+DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
+</pre>
+
+
+<h4>middleware class</h4>
+<pre class="code literal-block"><span></span><span class="c1"># simple_drf/middleware.py</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="n">THREAD_LOCAL</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+
+<span class="n">DB_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'thor'</span><span class="p">:</span> <span class="s1">'thor'</span><span class="p">,</span>
+    <span class="s1">'potter'</span><span class="p">:</span> <span class="s1">'potter'</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_current_db_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s2">"DB"</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_db_for_router</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s2">"DB"</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_hostname_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># split on `:` to remove port</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">':'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_tenant_db_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">hostname</span> <span class="o">=</span> <span class="n">_hostname_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">subdomain_prefix</span> <span class="o">=</span> <span class="n">hostname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">DB_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subdomain_prefix</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">TenantMiddleware</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">_tenant_db_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">set_db_for_router</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre>
+
+
+<p>middleware については 公式サイト <a href="https://docs.djangoproject.com/en/dev/topics/http/middleware/">Middleware | Django documentation | Django</a> を参照.</p>
+<p>アクセスがあると middleware が call されるので, 
+アクセス元のドメインを元に使用する DB を選択し <code>THREAD_LOCAL</code> 
+に記録しています.</p>
+<h5>settings.py の更新</h5>
+<p><code>settings.py</code>
+に middleware の設定を追加します.</p>
+<pre class="code literal-block"><span></span><span class="c1"># simple_drf/settings.py</span>
+
+
+<span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">....</span>
+
+    <span class="s1">'simple_drf.middleware.TenantMiddleware'</span><span class="p">,</span> <span class="c1"># 追加</span>
+<span class="p">]</span>
+</pre>
+
+
+<h4>db routing</h4>
+<p>Django では database routing という仕組みを使って, 使用する DB を選択できます.  <a href="https://docs.djangoproject.com/en/dev/topics/db/multi-db/">Multiple databases | Django documentation | Django</a></p>
+<p>今回は middleware で <code>THREAD_LOCAL</code> にセットされた DB に接続するようにします.</p>
+<pre class="code literal-block"><span></span><span class="c1"># simple_drf/db_router.py</span>
+
+<span class="kn">from</span> <span class="nn">.middleware</span> <span class="kn">import</span> <span class="n">get_current_db_name</span>
+
+
+<span class="k">class</span> <span class="nc">CustomDBRouter</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    DB のルーティングを制御します.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span> <span class="nf">common_routing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">get_current_db_name</span><span class="p">()</span> <span class="c1"># THREAD_LOCAL に登録された値を取得</span>
+
+        <span class="c1"># print('routing db', db)</span>
+        <span class="k">return</span> <span class="n">db</span>
+
+    <span class="k">def</span> <span class="nf">db_for_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_routing</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">db_for_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">common_routing</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">allow_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj1</span><span class="p">,</span> <span class="n">obj2</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Allow relations</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">allow_migrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">app_label</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        allow migrations</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</pre>
+
+
+<h4>migration</h4>
+<p>database を指定してマイグレーションします.</p>
+<pre class="code literal-block"><span></span><span class="go">python manage.py migrate --database=thor </span>
+<span class="go">python manage.py migrate --database=potter</span>
+</pre>
+
+
+<hr>
+<p>以上でドメイン別にアクセスすると, それぞれの DB へアクセスできるようになりました.</p>
+<p>私のサンプルコードではつぎのコマンドでユーザーを追加できるのでお試しできます.</p>
+<pre class="code literal-block"><span></span><span class="go">python manage.py loaddata --database thor accounts/fixtures/data.json  </span>
+<span class="go">python manage.py loaddata --database potter accounts/fixtures/data.json</span>
+</pre>
+
+
+<h4>manage コマンドへの対応</h4>
+<p>すべてのコマンドに db 指定ができるわけではないので,  テナントコンテキスト管理用の <code>tenant_context_manage.py</code> を作成します.</p>
+<p><code>manage.py</code> の main 関数を書き換え, 第1引数で DB を指定できるようにします.</p>
+<pre class="code literal-block"><span></span><span class="c1"># tenant_context_manage.py</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">'DJANGO_SETTINGS_MODULE'</span><span class="p">,</span> <span class="s1">'simple_drf.settings'</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="kn">import</span> <span class="n">execute_from_command_line</span>
+        <span class="kn">from</span> <span class="nn">django.core.management.commands.runserver</span> <span class="kn">import</span> <span class="n">Command</span> <span class="k">as</span> <span class="n">runserver</span>
+        <span class="n">runserver</span><span class="o">.</span><span class="n">default_addr</span> <span class="o">=</span> <span class="s2">"0.0.0.0"</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">"Couldn't import Django. Are you sure it's installed and "</span>
+            <span class="s2">"available on your PYTHONPATH environment variable? Did you "</span>
+            <span class="s2">"forget to activate a virtual environment?"</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+
+    <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">with</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">set_db_for_router</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">execute_from_command_line</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre>
+
+
+<p>super ユーザーの作成など, DBやデータの変更に関わるものはこの manager で行うようです.</p>
+<pre class="code literal-block"><span></span><span class="go">python tenant_context_manage.py thor createsuperuser --database=thor</span>
+</pre>
+
+
+<h3>おわりに</h3>
+<p>とても簡単にマルチテナントが実現できました. (MySQL や PostgreSQL ではまだみえてない問題が発生するかもですが)</p>
+<p>DB_MAP を default のデータベースに保存するなどで動的に接続先を変更したり, 増やしたりすることもできるようになりそうです.</p>
+<h4>わかってないこと</h4>
+<p>今回のようにユーザー情報も含めて分離する場合,  <code>manage.py</code> で <code>MIDDLEWARE</code> の指定順を厳密にすべきなのでは？と思っています.
+<code>AuthenticationMiddleware</code> よりも先に <code>TenantMiddleware</code> が実行されないと, 別のDBの認証情報が使われてしまったりしないかと懸念しています.</p>
+<h3>参考サイト</h3>
+<p><a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html">Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation</a> </p>
+</div>
+    </div>
+    <aside class="postpromonav"><nav><ul class="pager hidden-print">
+<li class="previous">
+                <a href="../../abc116_c.html" rel="prev" title="ABC116_C">一つ前の文書</a>
+            </li>
+        </ul></nav></aside></article><footer id="footer"><p>Contents © 2019        fumuumuf - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         </p>
+            
+        </footer>
+</div>
+    </section><script src="../../../assets/js/all-nocdn.js"></script><!-- fancy dates --><script>
+    moment.locale("ja");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script><!-- end fancy dates --><script>
+    baguetteBox.run('div#content', {
+        ignoreClass: 'islink',
+        captions: function(element) {
+            return element.getElementsByTagName('img')[0].alt;
+    }});
+    </script>
+</body>
+</html>

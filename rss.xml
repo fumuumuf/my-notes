@@ -1,5 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Data Scientist gocco</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/</link><description>data scientist gocco notes</description><atom:link href="https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>ja</language><copyright>Contents © 2019 fumuumuf </copyright><lastBuildDate>Tue, 09 Apr 2019 16:45:34 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>ABC116_C</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;p&gt;&lt;a href="https://atcoder.jp/contests/abc116/tasks/abc116_c"&gt;C - Grand Garden&lt;/a&gt;&lt;/p&gt;
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Data Scientist gocco</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/</link><description>data scientist gocco notes</description><atom:link href="https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>ja</language><copyright>Contents © 2019 fumuumuf </copyright><lastBuildDate>Thu, 18 Apr 2019 17:31:58 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>[Django] マルチテナントやってみた</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;h3&gt;はじめに&lt;/h3&gt;
+&lt;p&gt;1つのアプリケーションで店舗や施設, 企業ごとに独立したデータを扱いたいことは稀にあります. そんなときに使えそうなのが Multi Tenant.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html"&gt;Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;上記サイトでは&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1つのスキーマ内で独立させる&lt;/li&gt;
+&lt;li&gt;1つのDBで, 個別のスキーマを作り独立させる&lt;/li&gt;
+&lt;li&gt;DB自体 を独立させる&lt;/li&gt;
+&lt;li&gt;Docker を使って独立させる&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;方法が掲載されています. &lt;/p&gt;
+&lt;p&gt;どれも長所短所あると思うので, 要件に応じて使い分けるべきかなという印象.&lt;/p&gt;
+&lt;p&gt;1つめの1つのスキーマ内で独立させる方法は, どうしても &lt;code&gt;店舗id&lt;/code&gt; のような属性が必要になるので, そのフィルタリングを付与する方法を合わせて考えたほうが良いと思います.&lt;/p&gt;
+&lt;p&gt;今回は3つめのDB自体を独立させる方法を少しカスタマイズしつつ実装してみます.&lt;/p&gt;
+&lt;h3&gt;要件&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;上記サイトにならい 店舗は &lt;code&gt;thor&lt;/code&gt;, &lt;code&gt;potter&lt;/code&gt; があるとして, それぞれ専用の DB を用意します&lt;/li&gt;
+&lt;li&gt;アカウントなど他の app も DB を分けて管理します. 2つの店舗間で情報は共有されません&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;thor.local&lt;/code&gt;, &lt;code&gt;potter.local&lt;/code&gt; ドメインがあるとし, アクセスに対しそれぞれ &lt;code&gt;thor&lt;/code&gt; DB, &lt;code&gt;potter&lt;/code&gt; DB を参照するようにします&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;環境&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Python 3.7&lt;/li&gt;
+&lt;li&gt;Django 2.1&lt;/li&gt;
+&lt;li&gt;DB: SQLite&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;実装&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://github.com/fumuumuf/simple_drf/tree/multi_tenant"&gt;サンプルコード fumuumuf/simple_drf at multi_tenant&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;ざっくり手順&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;middleware でアクセスされたドメインから使用するDBを判別し &lt;code&gt;threading.local&lt;/code&gt; に記録&lt;/li&gt;
+&lt;li&gt;Database routing で 1 で記録した DB から使用する DB へルーティング&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;おおまかな手順はこれだけです.&lt;/p&gt;
+&lt;h4&gt;DB 設定&lt;/h4&gt;
+&lt;p&gt;DB の設定をします. 2つの DB &lt;code&gt;thor&lt;/code&gt;, &lt;code&gt;potter&lt;/code&gt; を追加します.&lt;/p&gt;
+&lt;p&gt;後述する db routing の設定 の &lt;code&gt;DATABASE_ROUTERS&lt;/code&gt; も合わせて行います.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;# simple_drf/settings.py
+
+DATABASES = {
+    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "default.sqlite3"},
+    "thor": {"ENGINE": "django.db.backends.sqlite3", "NAME": "thor.sqlite3"},
+    "potter": {"ENGINE": "django.db.backends.sqlite3", "NAME": "potter.sqlite3"},
+}
+
+DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
+&lt;/pre&gt;
+
+
+&lt;h4&gt;middleware class&lt;/h4&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# simple_drf/middleware.py&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;threading&lt;/span&gt;
+
+&lt;span class="n"&gt;THREAD_LOCAL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;threading&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;DB_MAP&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s1"&gt;'thor'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;'thor'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;'potter'&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;'potter'&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_current_db_name&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;THREAD_LOCAL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;"DB"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;set_db_for_router&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="nb"&gt;setattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;THREAD_LOCAL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;"DB"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_hostname_from_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c1"&gt;# split on `:` to remove port&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_host&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;':'&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lower&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_tenant_db_from_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;hostname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_hostname_from_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;subdomain_prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;hostname&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'.'&lt;/span&gt;&lt;span class="p"&gt;)[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;DB_MAP&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;subdomain_prefix&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TenantMiddleware&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;get_response&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_response&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__call__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;db&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_tenant_db_from_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;set_db_for_router&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;middleware については 公式サイト &lt;a href="https://docs.djangoproject.com/en/dev/topics/http/middleware/"&gt;Middleware | Django documentation | Django&lt;/a&gt; を参照.&lt;/p&gt;
+&lt;p&gt;アクセスがあると middleware が call されるので, 
+アクセス元のドメインを元に使用する DB を選択し &lt;code&gt;THREAD_LOCAL&lt;/code&gt; 
+に記録しています.&lt;/p&gt;
+&lt;h5&gt;settings.py の更新&lt;/h5&gt;
+&lt;p&gt;&lt;code&gt;settings.py&lt;/code&gt;
+に middleware の設定を追加します.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# simple_drf/settings.py&lt;/span&gt;
+
+
+&lt;span class="n"&gt;MIDDLEWARE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="o"&gt;....&lt;/span&gt;
+
+    &lt;span class="s1"&gt;'simple_drf.middleware.TenantMiddleware'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# 追加&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h4&gt;db routing&lt;/h4&gt;
+&lt;p&gt;Django では database routing という仕組みを使って, 使用する DB を選択できます.  &lt;a href="https://docs.djangoproject.com/en/dev/topics/db/multi-db/"&gt;Multiple databases | Django documentation | Django&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;今回は middleware で &lt;code&gt;THREAD_LOCAL&lt;/code&gt; にセットされた DB に接続するようにします.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# simple_drf/db_router.py&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;.middleware&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;get_current_db_name&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CustomDBRouter&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="sd"&gt;"""&lt;/span&gt;
+&lt;span class="sd"&gt;    DB のルーティングを制御します.&lt;/span&gt;
+&lt;span class="sd"&gt;    """&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;common_routing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;db&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_current_db_name&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# THREAD_LOCAL に登録された値を取得&lt;/span&gt;
+
+        &lt;span class="c1"&gt;# print('routing db', db)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;db&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;db_for_read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;hints&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;common_routing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;db_for_write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;hints&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;common_routing&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;allow_relation&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;obj1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;obj2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;hints&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="sd"&gt;"""&lt;/span&gt;
+&lt;span class="sd"&gt;        Allow relations&lt;/span&gt;
+&lt;span class="sd"&gt;        """&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;allow_migrate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;app_label&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;model_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;hints&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="sd"&gt;"""&lt;/span&gt;
+&lt;span class="sd"&gt;        allow migrations&lt;/span&gt;
+&lt;span class="sd"&gt;        """&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h4&gt;migration&lt;/h4&gt;
+&lt;p&gt;database を指定してマイグレーションします.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;python manage.py migrate --database=thor &lt;/span&gt;
+&lt;span class="go"&gt;python manage.py migrate --database=potter&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;hr&gt;
+&lt;p&gt;以上でドメイン別にアクセスすると, それぞれの DB へアクセスできるようになりました.&lt;/p&gt;
+&lt;p&gt;私のサンプルコードではつぎのコマンドでユーザーを追加できるのでお試しできます.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;python manage.py loaddata --database thor accounts/fixtures/data.json  &lt;/span&gt;
+&lt;span class="go"&gt;python manage.py loaddata --database potter accounts/fixtures/data.json&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h4&gt;manage コマンドへの対応&lt;/h4&gt;
+&lt;p&gt;すべてのコマンドに db 指定ができるわけではないので,  テナントコンテキスト管理用の &lt;code&gt;tenant_context_manage.py&lt;/code&gt; を作成します.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;manage.py&lt;/code&gt; の main 関数を書き換え, 第1引数で DB を指定できるようにします.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# tenant_context_manage.py&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;environ&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setdefault&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'DJANGO_SETTINGS_MODULE'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'simple_drf.settings'&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.core.management&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;execute_from_command_line&lt;/span&gt;
+        &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.core.management.commands.runserver&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Command&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;runserver&lt;/span&gt;
+        &lt;span class="n"&gt;runserver&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;default_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"0.0.0.0"&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;ImportError&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;exc&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="ne"&gt;ImportError&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="s2"&gt;"Couldn't import Django. Are you sure it's installed and "&lt;/span&gt;
+            &lt;span class="s2"&gt;"available on your PYTHONPATH environment variable? Did you "&lt;/span&gt;
+            &lt;span class="s2"&gt;"forget to activate a virtual environment?"&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;exc&lt;/span&gt;
+
+
+    &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;
+
+    &lt;span class="n"&gt;args&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;
+    &lt;span class="n"&gt;db&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;set_db_for_router&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;del&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;execute_from_command_line&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;super ユーザーの作成など, DBやデータの変更に関わるものはこの manager で行うようです.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;python tenant_context_manage.py thor createsuperuser --database=thor&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h3&gt;おわりに&lt;/h3&gt;
+&lt;p&gt;とても簡単にマルチテナントが実現できました. (MySQL や PostgreSQL ではまだみえてない問題が発生するかもですが)&lt;/p&gt;
+&lt;p&gt;DB_MAP を default のデータベースに保存するなどで動的に接続先を変更したり, 増やしたりすることもできるようになりそうです.&lt;/p&gt;
+&lt;h4&gt;わかってないこと&lt;/h4&gt;
+&lt;p&gt;今回のようにユーザー情報も含めて分離する場合,  &lt;code&gt;manage.py&lt;/code&gt; で &lt;code&gt;MIDDLEWARE&lt;/code&gt; の指定順を厳密にすべきなのでは？と思っています.
+&lt;code&gt;AuthenticationMiddleware&lt;/code&gt; よりも先に &lt;code&gt;TenantMiddleware&lt;/code&gt; が実行されないと, 別のDBの認証情報が使われてしまったりしないかと懸念しています.&lt;/p&gt;
+&lt;h3&gt;参考サイト&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html"&gt;Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation&lt;/a&gt; &lt;/p&gt;&lt;/div&gt;</description><category>Django</category><guid>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</guid><pubDate>Thu, 18 Apr 2019 15:00:00 GMT</pubDate></item><item><title>ABC116_C</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;p&gt;&lt;a href="https://atcoder.jp/contests/abc116/tasks/abc116_c"&gt;C - Grand Garden&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;各 \(h_i\) に必要な水やり回数を縦に積む.
 それを下から順に「連続した区間が何個できるか」を数えていき, 最後にそれらを合計する.&lt;/p&gt;
 &lt;h5&gt;入力例2 の場合の考え方&lt;/h5&gt;
