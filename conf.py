@@ -142,6 +142,7 @@ NAVIGATION_LINKS = {
         ('/archive.html', 'Archives', 'fa fa-folder-open'),
         ('/categories/index.html', 'Tags', 'fa fa-tags'),
         ('https://twitter.com/fumuumuf', 'twitter', 'fab fa-twitter'),
+        ('https://www.kaggle.com/fumuumuf', 'kaggle', 'fab fa-kaggle'),
     )
 }
 
