@@ -128,7 +128,7 @@ AWS の IAM の syntax と同じようにアクセス権限を定義できるっ
 <li>許可したいアクセスは <code>effect: allow</code> で許可する</li>
 <li>ひとつでも <code>effect: deny</code> の statement にマッチすれば, そのアクセスは拒否される</li>
 </ul>
-<p>という仕様. これに従い statement を定義する.</p>
+<p>という仕様. これに従い statements を定義する.</p>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ArticleAccessPolicy</span><span class="p">(</span><span class="n">AccessPolicy</span><span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    記事に関するアクセスポリシー</span>
@@ -182,11 +182,23 @@ AWS の IAM の syntax と同じようにアクセス権限を定義できるっ
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>statement の各値の詳細は
+<a href="https://rsinger86.github.io/drf-access-policy/statement_elements/">Statement Elements</a>
+を参照.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="View-の設定">View の設定<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#View-%E3%81%AE%E8%A8%AD%E5%AE%9A">¶</a>
 </h4>
 <p>view では <code>permission_classes</code> に作成した AccessPolicy を指定する.</p>
 <p><code>get_queryset</code> メソッドでは, AccessPolicy で定義しているクラスメソッド <code>scope_queryset</code> を呼び, アクセス権限に応じたフィルタリングを適用している.
-AccessPolicy でルールとフィルタリングを一緒に定義することができるので分かりやすい.</p>
+ルールとフィルタリングが すべてAccessPolicy で定義でき, Viewがシンプルになるので分かりやすい. action が複数あるときは特に有効に思う.</p>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ArticleViewSet</span><span class="p">(</span><span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
     <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ArticleAccessPolicy</span><span class="p">,)</span>
 
@@ -302,7 +314,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;Article: 40 - published article&gt;</pre>
+<pre>&lt;Article: 46 - published article&gt;</pre>
 </div>
 
 </div>
@@ -310,27 +322,79 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="editor-group-に所属しないユーザーでのアクセス">
+<code>editor</code> group に所属しないユーザーでのアクセス<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#editor-group-%E3%81%AB%E6%89%80%E5%B1%9E%E3%81%97%E3%81%AA%E3%81%84%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%81%A7%E3%81%AE%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9">¶</a>
+</h4>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In [5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### `editor` group に所属しないユーザーでのアクセス</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">'article-list'</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[5]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{'count': 1,
+ 'next': None,
+ 'previous': None,
+ 'results': [{'id': 46,
+   'category': None,
+   'title': 'published article',
+   'body': 'ham',
+   'status': 'publish',
+   'author': 1,
+   'tags': []}]}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="editor-group-に所属するユーザーでのアクセス">
+<code>editor</code> group に所属するユーザーでのアクセス<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#editor-group-%E3%81%AB%E6%89%80%E5%B1%9E%E3%81%99%E3%82%8B%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%81%A7%E3%81%AE%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9">¶</a>
+</h4>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In [6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-<span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">'article-list'</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
 <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 </pre></div>
 
@@ -350,73 +414,17 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{'count': 1,
- 'next': None,
- 'previous': None,
- 'results': [{'id': 40,
-   'category': None,
-   'title': 'published article',
-   'body': 'ham',
-   'status': 'publish',
-   'author': 1,
-   'tags': []}]}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [7]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### editor group に所属するユーザーでのアクセス</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [8]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
-<span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[8]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
 <pre>{'count': 2,
  'next': None,
  'previous': None,
- 'results': [{'id': 39,
+ 'results': [{'id': 45,
    'category': None,
    'title': 'unpublish article',
    'body': 'spam',
    'status': 'unpublish',
    'author': 1,
    'tags': []},
-  {'id': 40,
+  {'id': 46,
    'category': None,
    'title': 'published article',
    'body': 'ham',
@@ -438,14 +446,14 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="削除機能の制限を確認">削除機能の制限を確認<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E5%89%8A%E9%99%A4%E6%A9%9F%E8%83%BD%E3%81%AE%E5%88%B6%E9%99%90%E3%82%92%E7%A2%BA%E8%AA%8D">¶</a>
 </h3>
-<p>記事の author のユーザーのみ, 記事を削除できることを確認する.</p>
+<p>記事の author のユーザーのみ削除できることを確認する.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [9]:</div>
+<div class="prompt input_prompt">In [7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># テスト用の記事を登録</span>
@@ -463,14 +471,14 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="author-でない他の-editor-が削除できないことを確認する">author でない他の editor が削除できないことを確認する<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#author-%E3%81%A7%E3%81%AA%E3%81%84%E4%BB%96%E3%81%AE-editor-%E3%81%8C%E5%89%8A%E9%99%A4%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B">¶</a>
+<h4 id="author-でない他の-editor-が削除できないことを確認">author でない他の editor が削除できないことを確認<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#author-%E3%81%A7%E3%81%AA%E3%81%84%E4%BB%96%E3%81%AE-editor-%E3%81%8C%E5%89%8A%E9%99%A4%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8%E3%82%92%E7%A2%BA%E8%AA%8D">¶</a>
 </h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [10]:</div>
+<div class="prompt input_prompt">In [8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">'article-detail'</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">'pk'</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
@@ -484,7 +492,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [11]:</div>
+<div class="prompt input_prompt">In [9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -506,7 +514,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Forbidden: /articles/41/
+<pre>Forbidden: /articles/47/
 </pre>
 </div>
 </div>
@@ -532,7 +540,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>エラーコード 403 となりアクセスできない.</p>
+<p>エラーコード 403 となり, 削除できないことがわかる.</p>
 
 </div>
 </div>
@@ -549,7 +557,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [12]:</div>
+<div class="prompt input_prompt">In [10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
@@ -562,7 +570,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [13]:</div>
+<div class="prompt input_prompt">In [11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -597,7 +605,7 @@ AccessPolicy でルールとフィルタリングを一緒に定義すること�
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>204 が返ってきてるので, 削除できている.</p>
+<p>204 が返ってきてるので削除できている.</p>
 
 </div>
 </div>
