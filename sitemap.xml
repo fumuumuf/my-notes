@@ -7,54 +7,38 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/</loc>
-  <lastmod>2019-04-09T16:00:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/2019/</loc>
-  <lastmod>2019-04-07T13:19:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/archive.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/</loc>
-  <lastmod>2019-04-18T17:33:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/abc.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/dialy.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/django.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/galleries/</loc>
-  <lastmod>2019-04-07T13:19:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/listings/</loc>
-  <lastmod>2019-04-07T13:19:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</loc>
-  <lastmod>2019-04-18T17:29:00Z</lastmod>
- </url>
- <url>
-  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/dialy-2019-04-02.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</loc>
-  <lastmod>2019-04-18T17:42:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
 </urlset>

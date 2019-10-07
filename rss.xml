@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Data Scientist gocco</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/</link><description>data scientist gocco notes</description><atom:link href="https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>ja</language><copyright>Contents © 2019 fumuumuf </copyright><lastBuildDate>Thu, 18 Apr 2019 17:31:58 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>[Django] マルチテナントやってみた</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;h3&gt;はじめに&lt;/h3&gt;
+<?xml-stylesheet type="text/xsl" href="assets/xml/rss.xsl" media="all"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Data Scientist gocco</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/</link><description>data scientist gocco notes</description><atom:link href="https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml" rel="self" type="application/rss+xml"></atom:link><language>ja</language><copyright>Contents © 2019 fumuumuf </copyright><lastBuildDate>Mon, 07 Oct 2019 11:29:51 GMT</lastBuildDate><generator>Nikola (getnikola.com)</generator><docs>http://blogs.law.harvard.edu/tech/rss</docs><item><title>[Django] マルチテナントやってみた</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;h3&gt;はじめに&lt;/h3&gt;
 &lt;p&gt;1つのアプリケーションで店舗や施設, 企業ごとに独立したデータを扱いたいことは稀にあります. そんなときに使えそうなのが Multi Tenant.&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html"&gt;Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;上記サイトでは&lt;/p&gt;
@@ -36,15 +36,15 @@
 &lt;h4&gt;DB 設定&lt;/h4&gt;
 &lt;p&gt;DB の設定をします. 2つの DB &lt;code&gt;thor&lt;/code&gt;, &lt;code&gt;potter&lt;/code&gt; を追加します.&lt;/p&gt;
 &lt;p&gt;後述する db routing の設定 の &lt;code&gt;DATABASE_ROUTERS&lt;/code&gt; も合わせて行います.&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;# simple_drf/settings.py
+&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt; &lt;span class="n"&gt;simple_drf&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt;
 
-DATABASES = {
-    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "default.sqlite3"},
-    "thor": {"ENGINE": "django.db.backends.sqlite3", "NAME": "thor.sqlite3"},
-    "potter": {"ENGINE": "django.db.backends.sqlite3", "NAME": "potter.sqlite3"},
-}
+&lt;span class="n"&gt;DATABASES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;
+    &lt;span class="ss"&gt;"default"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;"ENGINE"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"django.db.backends.sqlite3"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;"NAME"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"default.sqlite3"&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="ss"&gt;"thor"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;"ENGINE"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"django.db.backends.sqlite3"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;"NAME"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"thor.sqlite3"&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="ss"&gt;"potter"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;"ENGINE"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"django.db.backends.sqlite3"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;"NAME"&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="ss"&gt;"potter.sqlite3"&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="err"&gt;}&lt;/span&gt;
 
-DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
+&lt;span class="n"&gt;DATABASE_ROUTERS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'simple_drf.db_router.CustomDBRouter'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;/pre&gt;
 
 
@@ -206,26 +206,7 @@ DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
 &lt;p&gt;今回のようにユーザー情報も含めて分離する場合,  &lt;code&gt;manage.py&lt;/code&gt; で &lt;code&gt;MIDDLEWARE&lt;/code&gt; の指定順を厳密にすべきなのでは？と思っています.
 &lt;code&gt;AuthenticationMiddleware&lt;/code&gt; よりも先に &lt;code&gt;TenantMiddleware&lt;/code&gt; が実行されないと, 別のDBの認証情報が使われてしまったりしないかと懸念しています.&lt;/p&gt;
 &lt;h3&gt;参考サイト&lt;/h3&gt;
-&lt;p&gt;&lt;a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html"&gt;Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation&lt;/a&gt; &lt;/p&gt;&lt;/div&gt;</description><category>Django</category><guid>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</guid><pubDate>Thu, 18 Apr 2019 15:00:00 GMT</pubDate></item><item><title>ABC116_C</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;p&gt;&lt;a href="https://atcoder.jp/contests/abc116/tasks/abc116_c"&gt;C - Grand Garden&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;各 \(h_i\) に必要な水やり回数を縦に積む.
-それを下から順に「連続した区間が何個できるか」を数えていき, 最後にそれらを合計する.&lt;/p&gt;
-&lt;h5&gt;入力例2 の場合の考え方&lt;/h5&gt;
-&lt;p&gt;&lt;img alt="example" src="https://petitlycee.gitlab.io/data-scientist-gocco-2/images/abc116_c.png"&gt;&lt;/p&gt;
-&lt;h5&gt;code&lt;/h5&gt;
-&lt;pre class="code literal-block"&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
-&lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;input&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;()))&lt;/span&gt;
-
-&lt;span class="n"&gt;cnt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
-&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;101&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="n"&gt;flg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;
-    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;flg&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;cnt&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-        &lt;span class="n"&gt;flg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;H&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;flg&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="n"&gt;cnt&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cnt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><category>ABC</category><guid>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/abc116_c.html</guid><pubDate>Tue, 09 Apr 2019 15:57:39 GMT</pubDate></item><item><title>[Django] 登録・更新ユーザーの保存</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;p&gt;モデルのインスタンスを save するときに, ログインユーザーを作成・更新ユーザーとして記録する.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://books.agiliq.com/projects/django-multi-tenant/en/latest/index.html"&gt;Building Multi Tenant Applications with Django — Building Multi Tenant Applications with Django 2.0 documentation&lt;/a&gt; &lt;/p&gt;&lt;/div&gt;</description><category>Django</category><guid>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</guid><pubDate>Thu, 18 Apr 2019 15:00:00 GMT</pubDate></item><item><title>[Django] 登録・更新ユーザーの保存</title><link>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</link><dc:creator>fumuumuf</dc:creator><description>&lt;div&gt;&lt;p&gt;モデルのインスタンスを save するときに, ログインユーザーを作成・更新ユーザーとして記録する.&lt;/p&gt;
 &lt;p&gt;以下パッケージが目的に合っているのでお試しする.  &lt;/p&gt;
 &lt;p&gt;&lt;a href="https://github.com/PaesslerAG/django-currentuser"&gt;PaesslerAG/django-currentuser: Conveniently store reference to request user on thread/db level.&lt;/a&gt;&lt;/p&gt;
 &lt;h3&gt;環境&lt;/h3&gt;

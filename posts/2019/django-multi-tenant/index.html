@@ -19,7 +19,7 @@
 <link rel="canonical" href="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/">
 <!--[if lt IE 9]><script src="../../../assets/js/html5shiv-printshiv.min.js"></script><![endif]--><meta name="google-site-verification" content="bBcYoUhMO74C6-ehIy10CRNZH9va0YR0KfVsa0NFQF8">
 <meta name="author" content="fumuumuf">
-<link rel="prev" href="../../abc116_c.html" title="ABC116_C" type="text/html">
+<link rel="prev" href="../../save-current-user.html" title="[Django] 登録・更新ユーザーの保存" type="text/html">
 <meta property="og:site_name" content="Data Scientist gocco">
 <meta property="og:title" content="[Django] マルチテナントやってみた">
 <meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/">
@@ -95,15 +95,15 @@
 <h4>DB 設定</h4>
 <p>DB の設定をします. 2つの DB <code>thor</code>, <code>potter</code> を追加します.</p>
 <p>後述する db routing の設定 の <code>DATABASE_ROUTERS</code> も合わせて行います.</p>
-<pre class="code literal-block"><span></span># simple_drf/settings.py
+<pre class="code literal-block"><span></span><span class="o">#</span> <span class="n">simple_drf</span><span class="o">/</span><span class="n">settings</span><span class="p">.</span><span class="n">py</span>
 
-DATABASES = {
-    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "default.sqlite3"},
-    "thor": {"ENGINE": "django.db.backends.sqlite3", "NAME": "thor.sqlite3"},
-    "potter": {"ENGINE": "django.db.backends.sqlite3", "NAME": "potter.sqlite3"},
-}
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="err">{</span>
+    <span class="ss">"default"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"default.sqlite3"</span><span class="err">}</span><span class="p">,</span>
+    <span class="ss">"thor"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"thor.sqlite3"</span><span class="err">}</span><span class="p">,</span>
+    <span class="ss">"potter"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"potter.sqlite3"</span><span class="err">}</span><span class="p">,</span>
+<span class="err">}</span>
 
-DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
+<span class="n">DATABASE_ROUTERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'simple_drf.db_router.CustomDBRouter'</span><span class="p">]</span>
 </pre>
 
 
@@ -270,7 +270,7 @@ DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
     </div>
     <aside class="postpromonav"><nav><ul class="pager hidden-print">
 <li class="previous">
-                <a href="../../abc116_c.html" rel="prev" title="ABC116_C">一つ前の文書</a>
+                <a href="../../save-current-user.html" rel="prev" title="[Django] 登録・更新ユーザーの保存">一つ前の文書</a>
             </li>
         </ul></nav></aside></article><footer id="footer"><p>Contents © 2019        fumuumuf - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         </p>
             
