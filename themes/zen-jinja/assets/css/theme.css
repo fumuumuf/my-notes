@@ -1087,7 +1087,7 @@ article.post-text + article.post-text {
 
 /* append styles */
 .cell div.prompt {
-    background-color:#EDF9FF;
+    background-color:#f2ebfb;
 }
 
 /* input cell の背景色をピンク系に */
@@ -1097,6 +1097,23 @@ article.post-text + article.post-text {
     padding: .8em;
 }
 
+/* output error */
+.content div.output_stderr {
+    background-color:#ff978d;
+}
+
+.content div.output_subarea{
+    max-width:100%;
+}
+
+.content .rendered_html pre, .content .rendered_html code {
+    background-color:#FCEEFC;
+}
+.content .rendered_html pre{
+    margin-bottom: 0px;
+    padding-top:1em;
+    padding-bottom:1em;
+}
 .content .input div.input_prompt{
     border-radius: 8px 8px 0 0;
  }
