@@ -247,7 +247,7 @@ section {
   bottom: 0;
   left: 0;
   right: 0;
-  width: 180px;
+  width: 80px;
 }
 @media (max-width: 773px) {
   .social {
@@ -256,7 +256,7 @@ section {
 }
 @media (min-width: 774px) and (max-width: 1047px) {
   .social {
-    width: 210px;
+    width: 80px;
   }
 }
 @media (max-width: 773px) {
@@ -269,7 +269,7 @@ section {
   margin: 0;
   top: 50px;
   display: table;
-  width: 180px;
+  width: 80px;
 }
 @media (max-width: 773px) {
   .social ul {
@@ -284,7 +284,7 @@ section {
 }
 @media (min-width: 774px) and (max-width: 1047px) {
   .social ul {
-    width: 210px;
+    width: 80px;
   }
 }
 .social ul li {
@@ -315,12 +315,12 @@ section {
 .page-content {
   min-height: 100%;
   padding: 48px 42px 60px 42px;
-  margin-left: 180px;
+  margin-left: 80px;
 }
 @media (min-width: 774px) and (max-width: 1047px) {
   .page-content {
     padding-left: 24px;
-    margin-left: 214px;
+    margin-left: 80px;
   }
 }
 @media (max-width: 773px) {
@@ -416,7 +416,7 @@ dd {
   white-space: nowrap;
 }
 .dl-horizontal dd {
-  margin-left: 180px;
+  margin-left: 80px;
 }
 .pagination {
   margin: 24px 0;
@@ -649,7 +649,7 @@ a:focus {
   -moz-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
   transition: opacity 0.5s;
-  font-size: 3em;
+  font-size: 2em;
 }
 @media (max-width: 773px) {
   .social a i {
@@ -662,7 +662,7 @@ a:focus {
   font-size: 26.25px;
 }
 .page-content {
-  font-family: "Noto Sans JP", "Bitter", "Georgia", "Times New Roman", sans-serif;
+  font-family: 'M PLUS 1p', sans-serif;
 }
 .page-content > .content {
   text-rendering: optimizeLegibility;
@@ -973,7 +973,7 @@ article.post-text .backlink + h1.title {
 }
 article.post-text .metadata {
   *zoom: 1;
-  color: #AAD4E3;
+  color: #8281d8;
   margin-bottom: 12px;
   /*margin-top: -6px;*/
 }
@@ -992,10 +992,10 @@ article.post-text .metadata .commentline {
 article.post-text .metadata p {
   margin: 0;
   display: inline-block;
-  color: #AAD4E3;
+  color: #8281d8;
 }
 article.post-text .metadata p a {
-  color: #AAD4E3;
+  color: #8281d8;
 }
 article.post-text .metadata p a:hover,
 article.post-text .metadata p:hover {
