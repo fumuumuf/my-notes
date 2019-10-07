@@ -331,7 +331,7 @@ section {
   }
 }
 .page-content > .content {
-  max-width: 1140px;
+  max-width: 1240px;
   margin: 0 auto;
 }
 @media (min-width: 774px) and (max-width: 1047px) {
@@ -1107,12 +1107,14 @@ article.post-text + article.post-text {
 }
 
 .content .rendered_html pre, .content .rendered_html code {
-    background-color:#FCEEFC;
+    background-color:#f7f7fe;
 }
 .content .rendered_html pre{
     margin-bottom: 0px;
     padding-top:1em;
     padding-bottom:1em;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
 }
 .content .input div.input_prompt{
     border-radius: 8px 8px 0 0;
