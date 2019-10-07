@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html prefix="
+        og: http://ogp.me/ns# article: http://ogp.me/ns/article#
+    " vocab="http://ogp.me/ns" lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>drf-access-policy 使ってみた | Data Scientist gocco</title>
+<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=M+PLUS+1p&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/ipython.min.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" hreflang="ja" href="../../rss.xml">
+<link rel="canonical" href="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html">
+<!--[if lt IE 9]><script src="../../assets/js/html5shiv-printshiv.min.js"></script><![endif]--><meta name="google-site-verification" content="bBcYoUhMO74C6-ehIy10CRNZH9va0YR0KfVsa0NFQF8">
+<meta name="author" content="fumuumuf">
+<link rel="prev" href="django-multi-tenant/" title="[Django] マルチテナントやってみた" type="text/html">
+<meta property="og:site_name" content="Data Scientist gocco">
+<meta property="og:title" content="drf-access-policy 使ってみた">
+<meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html">
+<meta property="og:description" content="はじめに¶Django Rest Framework のthird party パッケージの drf-access-policy を使ってアクセス制御をする.
+https://github.com/rsinger86/drf-access-policy
+AWS の IAM の syntax と同じようにアクセス権限を定義できるっぽい. (AWS はよく知らないのでわからない)
+
+
+
+
+
+
+
+環境¶">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2019-10-04T10:03:08+09:00">
+<meta property="article:tag" content="Django">
+</head>
+<body>
+    <a href="#page-content" class="sr-only sr-only-focusable">本文を読み飛ばす</a>
+    <section class="social"><ul>
+<li><a href="../../index.html" title="Home"><i class="fa fa-home"></i></a></li>
+            <li><a href="../../archive.html" title="Archives"><i class="fa fa-folder-open"></i></a></li>
+            <li><a href="../../categories/index.html" title="Tags"><i class="fa fa-tags"></i></a></li>
+            <li><a href="https://twitter.com/fumuumuf" title="twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="https://www.kaggle.com/fumuumuf" title="kaggle"><i class="fab fa-kaggle"></i></a></li>
+    
+    
+
+        </ul></section><section class="page-content"><div class="content" rel="main">
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html" class="u-url">drf-access-policy 使ってみた</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><a href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html" rel="bookmark"><i class="fa fa-clock"></i> <time class="published dt-published" datetime="2019-10-04T10:03:08+09:00" itemprop="datePublished" title="2019-10-04 10:03">2019-10-04 10:03</time></a></p>
+            
+            
+                <div class="tags">
+<h3 class="metadata-title">
+<i class="fa fa-tags"></i> タグ:</h3>
+        <ul itemprop="keywords" class="tags-ul">
+<li><a class="tag p-category" href="../../categories/django.html" rel="tag">Django</a></li>
+        </ul>
+</div>
+
+        </div>
+    </header><div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="はじめに">はじめに<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">¶</a>
+</h3>
+<p>Django Rest Framework のthird party パッケージの drf-access-policy を使ってアクセス制御をする.</p>
+<p><a href="https://github.com/rsinger86/drf-access-policy">https://github.com/rsinger86/drf-access-policy</a></p>
+<p>AWS の IAM の syntax と同じようにアクセス権限を定義できるっぽい. (AWS はよく知らないのでわからない)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="環境">環境<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E7%92%B0%E5%A2%83">¶</a>
+</h4>
+<ul>
+<li>Django==2.2.4</li>
+<li>djangorestframework==3.9.3</li>
+</ul>
+<p><a href="https://github.com/fumuumuf/simple_drf/tree/access-policy">sample code</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="つかいかた">つかいかた<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E3%81%A4%E3%81%8B%E3%81%84%E3%81%8B%E3%81%9F">¶</a>
+</h3>
+<p>基本的な使い方は</p>
+<ol>
+<li>
+<code>AccessPolicy</code> を継承したクラスを作成し,  statements を定義する</li>
+<li>view の <code>permission_classes</code> で作成したクラスを指定する</li>
+</ol>
+<p>となる.(<a href="https://rsinger86.github.io/drf-access-policy/usage/view_set_usage/">policy-for-viewset</a>)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="AccessPolicy">AccessPolicy<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#AccessPolicy">¶</a>
+</h4>
+<p>statements は</p>
+<ul>
+<li>デフォルトはすべてのアクセスを拒否</li>
+<li>許可したいアクセスは <code>effect: allow</code> で許可する</li>
+<li>ひとつでも <code>effect: deny</code> の statement にマッチすれば, そのアクセスは拒否される</li>
+</ul>
+<p>という仕様. これに従い statement を定義する.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ArticleAccessPolicy</span><span class="p">(</span><span class="n">AccessPolicy</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    記事に関するアクセスポリシー</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        デフォルトはすべてのアクセスを拒否</span>
+<span class="sd">    """</span>
+
+    <span class="n">statements</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"action"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"list"</span><span class="p">,</span> <span class="s2">"retrieve"</span><span class="p">],</span>
+            <span class="s2">"principal"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">,</span>
+            <span class="s2">"effect"</span><span class="p">:</span> <span class="s2">"allow"</span>
+        <span class="p">},</span>
+        <span class="c1"># editor グループに所属しているなら publish, unpublish アクションが可能</span>
+        <span class="p">{</span>
+            <span class="s2">"action"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"publish"</span><span class="p">,</span> <span class="s2">"unpublish"</span><span class="p">],</span>
+            <span class="s2">"principal"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"group:editor"</span><span class="p">],</span>
+            <span class="s2">"effect"</span><span class="p">:</span> <span class="s2">"allow"</span>
+        <span class="p">},</span>
+        <span class="c1"># is_author True なら delete(action:destroy) 可能</span>
+        <span class="p">{</span>
+            <span class="s2">"action"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"destroy"</span><span class="p">],</span>
+            <span class="s2">"principal"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"*"</span><span class="p">],</span>
+            <span class="s2">"effect"</span><span class="p">:</span> <span class="s2">"allow"</span><span class="p">,</span>
+            <span class="s2">"condition"</span><span class="p">:</span> <span class="s2">"is_author"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">is_author</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">"""</span>
+<span class="sd">        request.user が author であるか？</span>
+<span class="sd">        """</span>
+        <span class="c1"># scope_queryset を使用している場合, そのフィルタリングも適用されることに注意</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">==</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">scope_queryset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'editor'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">queryset</span>
+
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s1">'publish'</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="View-の設定">View の設定<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#View-%E3%81%AE%E8%A8%AD%E5%AE%9A">¶</a>
+</h4>
+<p>view では <code>permission_classes</code> に作成した AccessPolicy を指定する.</p>
+<p><code>get_queryset</code> メソッドでは, AccessPolicy で定義しているクラスメソッド <code>scope_queryset</code> を呼び, アクセス権限に応じたフィルタリングを適用している.
+AccessPolicy でルールとフィルタリングを一緒に定義することができるので分かりやすい.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ArticleViewSet</span><span class="p">(</span><span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ArticleAccessPolicy</span><span class="p">,)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">access_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">permission_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">ArticleSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">'category'</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">'tags'</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_policy</span><span class="o">.</span><span class="n">scope_queryset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="使ってみる">使ってみる<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B">¶</a>
+</h3>
+<p>実際にアクセスして検証する.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">rest_framework.test</span> <span class="k">import</span> <span class="n">APIClient</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">## editor グループを作成</span>
+<span class="n">editor_group</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'editor'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">author</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">another</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># ユーザー を editor group に登録</span>
+<span class="n">editor_group</span><span class="o">.</span><span class="n">user_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
+<span class="n">editor_group</span><span class="o">.</span><span class="n">user_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">another</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="queryset-のフィルタリング確認">queryset のフィルタリング確認<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#queryset-%E3%81%AE%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%AA%E3%83%B3%E3%82%B0%E7%A2%BA%E8%AA%8D">¶</a>
+</h3>
+<p><code>editor</code> group に所属しないユーザーは <code>unpublish</code>のデータを参照できないことを確認.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'unpublish article'</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">'spam'</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">'unpublish'</span><span class="p">)</span>
+<span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'published article'</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">'ham'</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">'publish'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[4]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;Article: 40 - published article&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### `editor` group に所属しないユーザーでのアクセス</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">'article-list'</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{'count': 1,
+ 'next': None,
+ 'previous': None,
+ 'results': [{'id': 40,
+   'category': None,
+   'title': 'published article',
+   'body': 'ham',
+   'status': 'publish',
+   'author': 1,
+   'tags': []}]}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">### editor group に所属するユーザーでのアクセス</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[8]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{'count': 2,
+ 'next': None,
+ 'previous': None,
+ 'results': [{'id': 39,
+   'category': None,
+   'title': 'unpublish article',
+   'body': 'spam',
+   'status': 'unpublish',
+   'author': 1,
+   'tags': []},
+  {'id': 40,
+   'category': None,
+   'title': 'published article',
+   'body': 'ham',
+   'status': 'publish',
+   'author': 1,
+   'tags': []}]}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="削除機能の制限を確認">削除機能の制限を確認<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E5%89%8A%E9%99%A4%E6%A9%9F%E8%83%BD%E3%81%AE%E5%88%B6%E9%99%90%E3%82%92%E7%A2%BA%E8%AA%8D">¶</a>
+</h3>
+<p>記事の author のユーザーのみ, 記事を削除できることを確認する.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># テスト用の記事を登録</span>
+<span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'author-test'</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="s1">'article body'</span><span class="p">)</span>
+<span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="author-でない他の-editor-が削除できないことを確認する">author でない他の editor が削除できないことを確認する<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#author-%E3%81%A7%E3%81%AA%E3%81%84%E4%BB%96%E3%81%AE-editor-%E3%81%8C%E5%89%8A%E9%99%A4%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B">¶</a>
+</h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">'article-detail'</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">'pk'</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
+<span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">another</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Forbidden: /articles/41/
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>403
+{'detail': 'このアクションを実行する権限がありません。'}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>エラーコード 403 となりアクセスできない.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="author-が削除できることを確認">author が削除できることを確認<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#author-%E3%81%8C%E5%89%8A%E9%99%A4%E3%81%A7%E3%81%8D%E3%82%8B%E3%81%93%E3%81%A8%E3%82%92%E7%A2%BA%E8%AA%8D">¶</a>
+</h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">client</span><span class="o">.</span><span class="n">force_authenticate</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>204
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>204 が返ってきてるので, 削除できている.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="おわりに">おわりに<a class="anchor-link" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB">¶</a>
+</h3>
+<p>複数の action の制御をわかりやすく, まとめて定義できるので良い感じ ヽ(・ω・｡)ﾉ</p>
+<p>他にも, グローバルに使用できる関数をつくれたり (<a href="https://rsinger86.github.io/drf-access-policy/reusable_conditions/">Re-Usable Conditions/Permissions</a>),<br>
+statements を json に書いておいて読み込むこともできるみたい.(<a href="https://rsinger86.github.io/drf-access-policy/loading_external_source/">Loading Statements from External Source</a>)</p>
+
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <aside class="postpromonav"><nav><ul class="pager hidden-print">
+<li class="previous">
+                <a href="django-multi-tenant/" rel="prev" title="[Django] マルチテナントやってみた">一つ前の文書</a>
+            </li>
+        </ul></nav></aside><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-SDRP1VVYu+tgAGKhddBSl5+ezofHKZeI+OzxakbIe/Y=" crossorigin="anonymous"></script><script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$latex ','$'], ['\\(','\\)']]}});
+        </script></article><footer id="footer"><p>Contents © 2019        fumuumuf - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         </p>
+            
+        </footer>
+</div>
+    </section><script src="../../assets/js/all-nocdn.js"></script><!-- fancy dates --><script>
+    moment.locale("ja");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script><!-- end fancy dates --><script>
+    baguetteBox.run('div#content', {
+        ignoreClass: 'islink',
+        captions: function(element) {
+            return element.getElementsByTagName('img')[0].alt;
+    }});
+    </script>
+</body>
+</html>
