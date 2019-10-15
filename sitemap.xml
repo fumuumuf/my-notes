@@ -7,42 +7,42 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/2019/</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/archive.html</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-07T12:33:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/dialy.html</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/django.html</loc>
-  <lastmod>2019-10-07T14:56:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html</loc>
-  <lastmod>2019-10-07T14:56:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-07T11:29:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/dialy-2019-04-02.html</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</loc>
-  <lastmod>2019-10-07T14:51:00Z</lastmod>
+  <lastmod>2019-10-15T11:18:00Z</lastmod>
  </url>
 </urlset>
