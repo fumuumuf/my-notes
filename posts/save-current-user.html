@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="description" content="作成・更新ユーザーの保存">
 <meta name="viewport" content="width=device-width">
-<title>[Django] 登録・更新ユーザーの保存 | Data Scientist gocco</title>
+<title>[Django] 登録・更新ユーザーの保存 | ふーむちゃんの日記</title>
 <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p%7CQuicksand&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
@@ -21,7 +21,7 @@
 <meta name="author" content="fumuumuf">
 <link rel="prev" href="dialy-2019-04-02.html" title="テストページ" type="text/html">
 <link rel="next" href="2019/django-multi-tenant/" title="[Django] マルチテナントやってみた" type="text/html">
-<meta property="og:site_name" content="Data Scientist gocco">
+<meta property="og:site_name" content="ふーむちゃんの日記">
 <meta property="og:title" content="[Django] 登録・更新ユーザーの保存">
 <meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html">
 <meta property="og:description" content="作成・更新ユーザーの保存">
@@ -80,34 +80,34 @@
 <h3>ユーザーの記録</h3>
 <p>これも README にあるとおり,  モデルのフィールドに <code>CurrentUserField</code> を使うだけでよい. <code>null</code>, <code>default</code>, <code>to</code> は自動でセットされるので指定してはいけない.</p>
 <p>また, <code>on_delete</code> を指定しないと <code>models.CASCADE</code> となるので注意.</p>
-<pre class="code literal-block"><span></span><span class="c1"># add import</span>
+<pre class="code literal-block"><span class="c"># add import</span>
 <span class="kn">from</span> <span class="nn">django_currentuser.db.models</span> <span class="kn">import</span> <span class="n">CurrentUserField</span>
 
 
 <span class="k">class</span> <span class="nc">Article</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 
-    <span class="c1"># ... 中略</span>
+    <span class="c"># ... 中略</span>
 
-    <span class="c1"># verbose_name や editable はお好みでつける</span>
-    <span class="n">created_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s1">'作成者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="c"># verbose_name や editable はお好みでつける</span>
+    <span class="n">created_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s">'作成者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre>
 
 
 <h3>更新ユーザー</h3>
 <p>モデルの <code>save</code> メソッドで, <code>get_current_authenticated_user</code> 関数を使って更新ユーザーを記録する.</p>
-<pre class="code literal-block"><span></span><span class="c1"># add import</span>
+<pre class="code literal-block"><span class="c"># add import</span>
 <span class="kn">from</span> <span class="nn">django_currentuser.middleware</span> <span class="kn">import</span> <span class="n">get_current_authenticated_user</span>
 
 
 <span class="k">class</span> <span class="nc">Article</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 
-    <span class="c1"># ... 中略</span>
+    <span class="c"># ... 中略</span>
 
-    <span class="c1"># relation 先(User) が updated_by と同じなので, related_name 引数を追加</span>
-    <span class="n">created_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s1">'作成者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">'create_articles'</span><span class="p">)</span>
+    <span class="c"># relation 先(User) が updated_by と同じなので, related_name 引数を追加</span>
+    <span class="n">created_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s">'作成者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">'create_articles'</span><span class="p">)</span>
 
-    <span class="c1"># フィールド追加</span>
-    <span class="n">updated_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s1">'更新者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">'update_articles'</span><span class="p">)</span>
+    <span class="c"># フィールド追加</span>
+    <span class="n">updated_by</span> <span class="o">=</span> <span class="n">CurrentUserField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s">'更新者'</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">'update_articles'</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updated_by</span> <span class="o">=</span> <span class="n">get_current_authenticated_user</span><span class="p">()</span>

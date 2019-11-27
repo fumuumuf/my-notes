@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html prefix="
+        og: http://ogp.me/ns# article: http://ogp.me/ns/article#
+    " vocab="http://ogp.me/ns" lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>[Django] モデルの verbose_name を テーブル comment に | ふーむちゃんの日記</title>
+<link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=M+PLUS+1p%7CQuicksand&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/ipython.min.css" rel="stylesheet" type="text/css">
+<link href="../../assets/css/nikola_ipython.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" hreflang="ja" href="../../rss.xml">
+<link rel="canonical" href="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-11-27-django-mysql-comment.html">
+<!--[if lt IE 9]><script src="../../assets/js/html5shiv-printshiv.min.js"></script><![endif]--><meta name="google-site-verification" content="bBcYoUhMO74C6-ehIy10CRNZH9va0YR0KfVsa0NFQF8">
+<meta name="author" content="fumuumuf">
+<link rel="prev" href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html" title="drf-access-policy 使ってみた" type="text/html">
+<meta property="og:site_name" content="ふーむちゃんの日記">
+<meta property="og:title" content="[Django] モデルの verbose_name を テーブル comment に">
+<meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-11-27-django-mysql-comment.html">
+<meta property="og:description" content="概要
+Django のモデルの verbose_name や フィールドの verbose_name を MySQL テーブルのコメントに追加する command を作る.
+Qiita の記事([a]) に同じ内容のものがあるが, 少し古くMySQL 用でもないため自作した.
+
+
+環境
+
+Django 2.1
+MySQL 5.7
+
+
+
+実装
+
+コード
+&lt;app&gt;/management/comman">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2019-11-27T09:14:00+09:00">
+<meta property="article:tag" content="Django">
+</head>
+<body>
+    <a href="#page-content" class="sr-only sr-only-focusable">本文を読み飛ばす</a>
+    <section class="social"><ul>
+<li><a href="../../index.html" title="Home"><i class="fa fa-home"></i></a></li>
+            <li><a href="../../archive.html" title="Archives"><i class="fa fa-folder-open"></i></a></li>
+            <li><a href="../../categories/index.html" title="Tags"><i class="fa fa-tags"></i></a></li>
+            <li><a href="https://twitter.com/fumuumuf" title="twitter"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="https://www.kaggle.com/fumuumuf" title="kaggle"><i class="fab fa-kaggle"></i></a></li>
+    
+    
+
+        </ul></section><section class="page-content"><div class="content" rel="main">
+<article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="#" class="u-url">[Django] モデルの verbose_name を テーブル comment に</a></h1>
+
+        <div class="metadata">
+            <p class="dateline"><a href="#" rel="bookmark"><i class="fa fa-clock"></i> <time class="published dt-published" datetime="2019-11-27T09:14:00+09:00" itemprop="datePublished" title="2019-11-27 09:14">2019-11-27 09:14</time></a></p>
+            
+            
+                <div class="tags">
+<h3 class="metadata-title">
+<i class="fa fa-tags"></i> タグ:</h3>
+        <ul itemprop="keywords" class="tags-ul">
+<li><a class="tag p-category" href="../../categories/django.html" rel="tag">Django</a></li>
+        </ul>
+</div>
+
+        </div>
+    </header><div class="e-content entry-content" itemprop="articleBody text">
+    <div>
+<div class="section" id="id1">
+<h2>概要</h2>
+<p>Django のモデルの <tt class="docutils literal">verbose_name</tt> や フィールドの <tt class="docutils literal">verbose_name</tt> を MySQL テーブルのコメントに追加する command を作る.</p>
+<p>Qiita の記事(<a class="citation-reference" href="2019-11-27-django-mysql-comment.html#a" id="id2">[a]</a>) に同じ内容のものがあるが, 少し古くMySQL 用でもないため自作した.</p>
+</div>
+<div class="section" id="id3">
+<h2>環境</h2>
+<ul class="simple">
+<li>Django 2.1</li>
+<li>MySQL 5.7</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h2>実装</h2>
+<div class="section" id="id5">
+<h3>コード</h3>
+<p><tt class="docutils literal"><span class="pre">&lt;app&gt;/management/commands/add_mysql_comments.py</span></tt> を作成</p>
+<pre class="code python"><a name="rest_code_a191840132ab492b8f792c98b974dfc1-1"></a><span class="kn">import</span> <span class="nn">re</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-2"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-3"></a><span class="kn">from</span> <span class="nn">django.core.management.base</span> <span class="kn">import</span> <span class="n">AppCommand</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-4"></a><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connections</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-5"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-6"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-7"></a><span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="n">AppCommand</span><span class="p">):</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-8"></a>    <span class="n">help</span> <span class="o">=</span> <span class="s">'add mysql comments'</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-9"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-10"></a>    <span class="n">cursor</span> <span class="o">=</span> <span class="bp">None</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-11"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-12"></a>    <span class="k">def</span> <span class="nf">alter_table_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-13"></a>        <span class="n">meta</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_meta</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-14"></a>        <span class="n">statement</span> <span class="o">=</span> <span class="n">f</span><span class="s">"ALTER TABLE {meta.db_table} COMMENT '{meta.verbose_name}';"</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-15"></a>        <span class="c"># statements.append(statement)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-16"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-17"></a>        <span class="k">return</span> <span class="n">statement</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-18"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-19"></a>    <span class="k">def</span> <span class="nf">_get_alter_column_statements_without_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-20"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-21"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">f</span><span class="s">'SHOW CREATE TABLE {table_name}'</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-22"></a>        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-23"></a>        <span class="n">sql</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-24"></a>        <span class="n">lines</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">r'[\r\n]+'</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-25"></a>        <span class="n">columns</span> <span class="o">=</span> <span class="p">{}</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-26"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-27"></a>        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-28"></a>            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-29"></a>            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r'^`(.*?)`[^,]*'</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-30"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span> <span class="k">continue</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-31"></a>            <span class="n">s</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-32"></a>            <span class="c"># 既存コメント除外</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-33"></a>            <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r"COMMENT +'([^']|'')+'[ ,$]?"</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-34"></a>            <span class="n">columns</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">s</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-35"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-36"></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-37"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-38"></a>            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="s">'alter table `{table_name}` modify {v} '</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-39"></a>        <span class="k">return</span> <span class="n">res</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-40"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-41"></a>    <span class="k">def</span> <span class="nf">alter_columns_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-42"></a>        <span class="n">meta</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_meta</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-43"></a>        <span class="n">table_name</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">db_table</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-44"></a>        <span class="n">alter_statements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alter_column_statements_without_comment</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-45"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-46"></a>        <span class="n">statements</span> <span class="o">=</span> <span class="p">[]</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-47"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-48"></a>        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-49"></a>            <span class="n">column</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">db_column</span> <span class="ow">or</span> <span class="n">field</span><span class="o">.</span><span class="n">column</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-50"></a>            <span class="n">statement</span> <span class="o">=</span> <span class="n">alter_statements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-51"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">statement</span><span class="p">:</span> <span class="k">continue</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-52"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-53"></a>            <span class="n">comment</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">verbose_name</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-54"></a>            <span class="k">if</span> <span class="n">comment</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-55"></a>                <span class="n">statement</span> <span class="o">+=</span> <span class="n">f</span><span class="s">" COMMENT '{comment}'"</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-56"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-57"></a>                <span class="n">statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-58"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-59"></a>        <span class="k">return</span> <span class="n">statements</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-60"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-61"></a>    <span class="k">def</span> <span class="nf">handle_app_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_config</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-62"></a>        <span class="sd">"""</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-63"></a><span class="sd">        # TODO: database を指定(今 default 固定)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-64"></a><span class="sd">        # TODO: 除外モデルを指定</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-65"></a><span class="sd">        """</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-66"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-67"></a>        <span class="k">if</span> <span class="n">app_config</span><span class="o">.</span><span class="n">models_module</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-68"></a>            <span class="k">return</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-69"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-70"></a>        <span class="n">connection</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s">'default'</span><span class="p">]</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-71"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-72"></a>        <span class="n">models</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">get_models</span><span class="p">(</span><span class="n">include_auto_created</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-73"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-74"></a>        <span class="n">statements</span> <span class="o">=</span> <span class="p">[]</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-75"></a>        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-76"></a>            <span class="n">statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alter_table_comment</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-77"></a>            <span class="n">statements</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alter_columns_comment</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-78"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-79"></a>        <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c"># 必要？</span>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-80"></a>
+<a name="rest_code_a191840132ab492b8f792c98b974dfc1-81"></a>        <span class="k">return</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statements</span><span class="p">)</span>
+</pre>
+</div>
+<div class="section" id="id6">
+<h3>使い方</h3>
+<p><tt class="docutils literal">./manage.py add_mysql_comments</tt> のあとに, 対象の app 名を指定する. 複数の app を指定したい場合は スペース区切りで指定する.</p>
+<pre class="code bash"><a name="rest_code_79f2366dff164642b7fafde4ba48ce23-1"></a>./manage.py add_mysql_comments &lt;app1&gt; &lt;app2&gt;
+</pre>
+<div class="section" id="id7">
+<h4>テーブル確認</h4>
+<p>MySQL で <tt class="docutils literal">SHOW CREATE TABLE accounts_user;</tt></p>
+<pre class="code sql"><a name="rest_code_01533f4bf5f24c009c8583975a727b34-1"></a><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">accounts_user</span><span class="o">`</span> <span class="p">(</span>
+<a name="rest_code_01533f4bf5f24c009c8583975a727b34-2"></a>  <span class="o">`</span><span class="n">password</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'パスワード'</span><span class="p">,</span>
+<a name="rest_code_01533f4bf5f24c009c8583975a727b34-3"></a>  <span class="o">`</span><span class="n">last_login</span><span class="o">`</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'最終ログイン'</span><span class="p">,</span>
+<a name="rest_code_01533f4bf5f24c009c8583975a727b34-4"></a>  <span class="o">`</span><span class="n">is_superuser</span><span class="o">`</span> <span class="n">tinyint</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'スーパーユーザー権限'</span><span class="p">,</span>
+<a name="rest_code_01533f4bf5f24c009c8583975a727b34-5"></a>  <span class="o">`</span><span class="n">username</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'ユーザー名'</span><span class="p">,</span>
+<a name="rest_code_01533f4bf5f24c009c8583975a727b34-6"></a>  <span class="p">...</span> <span class="err">以下略</span>
+</pre>
+<p>となっていれば OK.</p>
+<table class="docutils citation" frame="void" id="a" rules="none">
+<colgroup>
+<col class="label">
+<col>
+</colgroup>
+<tbody valign="top"><tr>
+<td class="label"><a class="fn-backref" href="2019-11-27-django-mysql-comment.html#id2">[a]</a></td>
+<td><a class="reference external" href="https://qiita.com/44d/items/6efdb4050b3c4fb4c181">https://qiita.com/44d/items/6efdb4050b3c4fb4c181</a></td>
+</tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <aside class="postpromonav"><nav><ul class="pager hidden-print">
+<li class="previous">
+                <a href="2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html" rel="prev" title="drf-access-policy 使ってみた">一つ前の文書</a>
+            </li>
+        </ul></nav></aside><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-SDRP1VVYu+tgAGKhddBSl5+ezofHKZeI+OzxakbIe/Y=" crossorigin="anonymous"></script><script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$latex ','$'], ['\\(','\\)']]}});
+        </script></article><footer id="footer"><p>Contents © 2019        fumuumuf - Powered by         <a href="https://getnikola.com" rel="nofollow">Nikola</a>         </p>
+            
+        </footer>
+</div>
+    </section><script src="../../assets/js/all-nocdn.js"></script><!-- fancy dates --><script>
+    moment.locale("ja");
+    fancydates(0, "YYYY-MM-DD HH:mm");
+    </script><!-- end fancy dates --><script>
+    baguetteBox.run('div#content', {
+        ignoreClass: 'islink',
+        captions: function(element) {
+            return element.getElementsByTagName('img')[0].alt;
+    }});
+    </script>
+</body>
+</html>

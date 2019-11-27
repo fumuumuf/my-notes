@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="description" content="Django multi tenant app">
 <meta name="viewport" content="width=device-width">
-<title>[Django] マルチテナントやってみた | Data Scientist gocco</title>
+<title>[Django] マルチテナントやってみた | ふーむちゃんの日記</title>
 <link href="https://fonts.googleapis.com/css?family=Bitter:400,400i,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=M+PLUS+1p%7CQuicksand&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
@@ -21,7 +21,7 @@
 <meta name="author" content="fumuumuf">
 <link rel="prev" href="../../save-current-user.html" title="[Django] 登録・更新ユーザーの保存" type="text/html">
 <link rel="next" href="../2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html" title="drf-access-policy 使ってみた" type="text/html">
-<meta property="og:site_name" content="Data Scientist gocco">
+<meta property="og:site_name" content="ふーむちゃんの日記">
 <meta property="og:title" content="[Django] マルチテナントやってみた">
 <meta property="og:url" content="https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/">
 <meta property="og:description" content="Django multi tenant app">
@@ -96,54 +96,54 @@
 <h4>DB 設定</h4>
 <p>DB の設定をします. 2つの DB <code>thor</code>, <code>potter</code> を追加します.</p>
 <p>後述する db routing の設定 の <code>DATABASE_ROUTERS</code> も合わせて行います.</p>
-<pre class="code literal-block"><span></span><span class="o">#</span> <span class="n">simple_drf</span><span class="o">/</span><span class="n">settings</span><span class="p">.</span><span class="n">py</span>
+<pre class="code literal-block"># simple_drf/settings.py
 
-<span class="n">DATABASES</span> <span class="o">=</span> <span class="err">{</span>
-    <span class="ss">"default"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"default.sqlite3"</span><span class="err">}</span><span class="p">,</span>
-    <span class="ss">"thor"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"thor.sqlite3"</span><span class="err">}</span><span class="p">,</span>
-    <span class="ss">"potter"</span><span class="p">:</span> <span class="err">{</span><span class="ss">"ENGINE"</span><span class="p">:</span> <span class="ss">"django.db.backends.sqlite3"</span><span class="p">,</span> <span class="ss">"NAME"</span><span class="p">:</span> <span class="ss">"potter.sqlite3"</span><span class="err">}</span><span class="p">,</span>
-<span class="err">}</span>
+DATABASES = {
+    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "default.sqlite3"},
+    "thor": {"ENGINE": "django.db.backends.sqlite3", "NAME": "thor.sqlite3"},
+    "potter": {"ENGINE": "django.db.backends.sqlite3", "NAME": "potter.sqlite3"},
+}
 
-<span class="n">DATABASE_ROUTERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'simple_drf.db_router.CustomDBRouter'</span><span class="p">]</span>
+DATABASE_ROUTERS = ['simple_drf.db_router.CustomDBRouter']
 </pre>
 
 
 <h4>middleware class</h4>
-<pre class="code literal-block"><span></span><span class="c1"># simple_drf/middleware.py</span>
+<pre class="code literal-block"><span class="c"># simple_drf/middleware.py</span>
 
 <span class="kn">import</span> <span class="nn">threading</span>
 
 <span class="n">THREAD_LOCAL</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
 
 <span class="n">DB_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'thor'</span><span class="p">:</span> <span class="s1">'thor'</span><span class="p">,</span>
-    <span class="s1">'potter'</span><span class="p">:</span> <span class="s1">'potter'</span>
+    <span class="s">'thor'</span><span class="p">:</span> <span class="s">'thor'</span><span class="p">,</span>
+    <span class="s">'potter'</span><span class="p">:</span> <span class="s">'potter'</span>
 <span class="p">}</span>
 
 <span class="k">def</span> <span class="nf">get_current_db_name</span><span class="p">():</span>
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s2">"DB"</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s">"DB"</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">set_db_for_router</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s2">"DB"</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">THREAD_LOCAL</span><span class="p">,</span> <span class="s">"DB"</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_hostname_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="c1"># split on `:` to remove port</span>
-    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">':'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c"># split on `:` to remove port</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">':'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_tenant_db_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="n">hostname</span> <span class="o">=</span> <span class="n">_hostname_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="n">subdomain_prefix</span> <span class="o">=</span> <span class="n">hostname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">subdomain_prefix</span> <span class="o">=</span> <span class="n">hostname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'.'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">DB_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subdomain_prefix</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">TenantMiddleware</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">_tenant_db_from_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
         <span class="n">set_db_for_router</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
@@ -158,13 +158,13 @@
 <h5>settings.py の更新</h5>
 <p><code>settings.py</code>
 に middleware の設定を追加します.</p>
-<pre class="code literal-block"><span></span><span class="c1"># simple_drf/settings.py</span>
+<pre class="code literal-block"><span class="c"># simple_drf/settings.py</span>
 
 
 <span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
     <span class="o">....</span>
 
-    <span class="s1">'simple_drf.middleware.TenantMiddleware'</span><span class="p">,</span> <span class="c1"># 追加</span>
+    <span class="s">'simple_drf.middleware.TenantMiddleware'</span><span class="p">,</span> <span class="c"># 追加</span>
 <span class="p">]</span>
 </pre>
 
@@ -172,7 +172,7 @@
 <h4>db routing</h4>
 <p>Django では database routing という仕組みを使って, 使用する DB を選択できます.  <a href="https://docs.djangoproject.com/en/dev/topics/db/multi-db/">Multiple databases | Django documentation | Django</a></p>
 <p>今回は middleware で <code>THREAD_LOCAL</code> にセットされた DB に接続するようにします.</p>
-<pre class="code literal-block"><span></span><span class="c1"># simple_drf/db_router.py</span>
+<pre class="code literal-block"><span class="c"># simple_drf/db_router.py</span>
 
 <span class="kn">from</span> <span class="nn">.middleware</span> <span class="kn">import</span> <span class="n">get_current_db_name</span>
 
@@ -183,9 +183,9 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="nf">common_routing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
-        <span class="n">db</span> <span class="o">=</span> <span class="n">get_current_db_name</span><span class="p">()</span> <span class="c1"># THREAD_LOCAL に登録された値を取得</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">get_current_db_name</span><span class="p">()</span> <span class="c"># THREAD_LOCAL に登録された値を取得</span>
 
-        <span class="c1"># print('routing db', db)</span>
+        <span class="c"># print('routing db', db)</span>
         <span class="k">return</span> <span class="n">db</span>
 
     <span class="k">def</span> <span class="nf">db_for_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
@@ -210,7 +210,7 @@
 
 <h4>migration</h4>
 <p>database を指定してマイグレーションします.</p>
-<pre class="code literal-block"><span></span><span class="go">python manage.py migrate --database=thor </span>
+<pre class="code literal-block"><span class="go">python manage.py migrate --database=thor </span>
 <span class="go">python manage.py migrate --database=potter</span>
 </pre>
 
@@ -218,7 +218,7 @@
 <hr>
 <p>以上でドメイン別にアクセスすると, それぞれの DB へアクセスできるようになりました.</p>
 <p>私のサンプルコードではつぎのコマンドでユーザーを追加できるのでお試しできます.</p>
-<pre class="code literal-block"><span></span><span class="go">python manage.py loaddata --database thor accounts/fixtures/data.json  </span>
+<pre class="code literal-block"><span class="go">python manage.py loaddata --database thor accounts/fixtures/data.json  </span>
 <span class="go">python manage.py loaddata --database potter accounts/fixtures/data.json</span>
 </pre>
 
@@ -226,19 +226,19 @@
 <h4>manage コマンドへの対応</h4>
 <p>すべてのコマンドに db 指定ができるわけではないので,  テナントコンテキスト管理用の <code>tenant_context_manage.py</code> を作成します.</p>
 <p><code>manage.py</code> の main 関数を書き換え, 第1引数で DB を指定できるようにします.</p>
-<pre class="code literal-block"><span></span><span class="c1"># tenant_context_manage.py</span>
+<pre class="code literal-block"><span class="c"># tenant_context_manage.py</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">'DJANGO_SETTINGS_MODULE'</span><span class="p">,</span> <span class="s1">'simple_drf.settings'</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s">'DJANGO_SETTINGS_MODULE'</span><span class="p">,</span> <span class="s">'simple_drf.settings'</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="kn">import</span> <span class="n">execute_from_command_line</span>
         <span class="kn">from</span> <span class="nn">django.core.management.commands.runserver</span> <span class="kn">import</span> <span class="n">Command</span> <span class="k">as</span> <span class="n">runserver</span>
-        <span class="n">runserver</span><span class="o">.</span><span class="n">default_addr</span> <span class="o">=</span> <span class="s2">"0.0.0.0"</span>
+        <span class="n">runserver</span><span class="o">.</span><span class="n">default_addr</span> <span class="o">=</span> <span class="s">"0.0.0.0"</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">"Couldn't import Django. Are you sure it's installed and "</span>
-            <span class="s2">"available on your PYTHONPATH environment variable? Did you "</span>
-            <span class="s2">"forget to activate a virtual environment?"</span>
+            <span class="s">"Couldn't import Django. Are you sure it's installed and "</span>
+            <span class="s">"available on your PYTHONPATH environment variable? Did you "</span>
+            <span class="s">"forget to activate a virtual environment?"</span>
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
 
 
@@ -255,7 +255,7 @@
 
 
 <p>super ユーザーの作成など, DBやデータの変更に関わるものはこの manager で行うようです.</p>
-<pre class="code literal-block"><span></span><span class="go">python tenant_context_manage.py thor createsuperuser --database=thor</span>
+<pre class="code literal-block"><span class="go">python tenant_context_manage.py thor createsuperuser --database=thor</span>
 </pre>
 
 
