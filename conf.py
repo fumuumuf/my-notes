@@ -17,7 +17,7 @@ import time
 
 # Data about this site
 BLOG_AUTHOR = "fumuumuf"  # (translatable)
-BLOG_TITLE = "Data Scientist gocco"  # (translatable)
+BLOG_TITLE = "ふーむちゃんの日記"  # (translatable)
 # This is the main URL for your site. It will be used
 # in a prominent link. Don't forget the protocol (http/https)!
 SITE_URL = "https://petitlycee.gitlab.io/data-scientist-gocco-2/"
