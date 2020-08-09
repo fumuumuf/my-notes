@@ -7,18 +7,22 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/dialy.xml</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/django.xml</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
+ </sitemap>
+ <sitemap>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/image.xml</loc>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/rss.xml</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </sitemap>
  <sitemap>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/sitemap.xml</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </sitemap>
 </sitemapindex>

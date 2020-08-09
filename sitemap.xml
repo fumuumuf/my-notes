@@ -7,46 +7,62 @@
                         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/</loc>
-  <lastmod>2019-11-27T00:11:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/2019/</loc>
-  <lastmod>2019-11-27T00:11:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/2020/</loc>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/archive.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/</loc>
-  <lastmod>2019-11-27T00:11:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/dialy.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/django.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/categories/image.html</loc>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-10-04_drf-access-policy_%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/2019-11-27-django-mysql-comment.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2019/django-multi-tenant/</loc>
-  <lastmod>2019-11-27T00:11:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2020/color_transfer/Color_Transfer_between_Images.html</loc>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
+ </url>
+ <url>
+  <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/2020/color_transfer/color_transfer_lab.html</loc>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/dialy-2019-04-02.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
  <url>
   <loc>https://petitlycee.gitlab.io/data-scientist-gocco-2/posts/save-current-user.html</loc>
-  <lastmod>2019-11-27T00:24:00Z</lastmod>
+  <lastmod>2020-08-09T04:20:00Z</lastmod>
  </url>
 </urlset>
